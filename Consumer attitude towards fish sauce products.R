@@ -316,12 +316,26 @@ df_res_pca_score <- l_res_pca[["scores"]] %>% tbl_df()
 respondent_labels <- 1:nrow(df_input)
 respondent_col <- rainbow(nrow(df_input))
 
-ggplot(df_res_pca_score, aes(PC1, PC2))+
-  geom_text(aes(label = respondent_labels, col = respondent_col), 
+df_res_pca_loading <- 
+  tibble("item" = names(df_a),
+         "PC1" = l_res_pca[["loadings"]][1:6],
+         "PC2" = l_res_pca[["loadings"]][7:12])
+
+ggplot(df_res_pca_loading, aes(PC1, PC2))+
+  geom_text(aes(label = item))+
+  scale_x_continuous(breaks = seq(0,1, 0.1), limits = c(0,1))+
+  scale_y_continuous(breaks = seq(-1, 1, 0.1), limits = c(-1,1))+
+  theme_bw()
+
+respondent_labels <- 1:nrow(df_input)
+# respondent_col <- rainbow(nrow(df_input))
+
+bind_cols(df_res_pca_score, df_demo) %>% 
+  ggplot(aes(PC1, PC2))+
+  geom_text(aes(label = respondent_labels, col = gender), 
             position = position_jitter(height = 0.4))+
   theme_bw()+
-  theme(legend.position = "none")
-
+  theme(legend.position = "bottom")
 #' 
 #' **Revealing special cases:**
 #' 
