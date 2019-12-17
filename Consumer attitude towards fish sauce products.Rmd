@@ -83,7 +83,7 @@ kable_adj <- function(data, names = NA, ncol = NA, width = NA) {
         position = "left",
         bootstrap_options = c("condensed", "bordered")
         ) %>% 
-      row_spec(0, bold = T, color = "black", background = "#D9E2F3")
+      row_spec(0, bold = T, color = "black", background = "#61bbed")
   }
   if (is.na(sum(ncol))) {
     default_table(data)
@@ -92,6 +92,8 @@ kable_adj <- function(data, names = NA, ncol = NA, width = NA) {
       column_spec(ncol, width)
   }
 }
+
+v_palette_pander <- c("#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#999999","#E69F00","#56B4E9","#009E73")
 ```
 
 ```{r}
@@ -166,7 +168,7 @@ df_sample_structure %>% kable_adj(names = c("Variable", "Level", "No. of respond
 ```{r}
 df_sample_structure %>% 
   ggplot(aes(reorder(value, no_of_respondent), no_of_respondent))+
-  geom_col()+
+  geom_col(fill = v_palette_pander[1])+
   geom_text(aes(y = no_of_respondent + 25, label = proportion))+
   facet_wrap(~variable, scales = "free_y")+
   labs(x="", y = "Number of respondents", title = "Number of respondents by age groups")+
@@ -181,7 +183,8 @@ Respondent age is not normally distributed. 1/3 respondents are 22 years old.
 
 ```{r}
 ggplot(df_demo, aes(age))+
-  geom_histogram(binwidth = 1)+
+  geom_histogram(binwidth = 1,
+                 fill = v_palette_pander[1])+
   scale_x_continuous(breaks = 20:70)+
   geom_vline(xintercept = 22, col = "red")+
   labs(title = "Respondents' age distribution", x = "Age", y = "Number of respondents")+
@@ -194,7 +197,9 @@ Female respondents age is extremely right skewed.
 ```{r}
 df_demo %>% 
   ggplot(aes(age))+
-  geom_density(aes(fill = gender), alpha = 0.4)+
+  geom_density(aes(fill = gender, col = gender), alpha = 0.4)+
+  scale_fill_manual(values = v_palette_pander[c(4,5)])+
+  scale_color_manual(values = v_palette_pander[c(4,5)])+
   labs(title = "Respondents' age distribution by gender", 
       x = "Age", 
       y = "Density")+
@@ -207,9 +212,10 @@ df_demo %>%
   ggplot(aes(native.village, age, col = native.village))+
   geom_boxplot(alpha = 0)+
   geom_jitter()+
-  labs(title = "Respondents' age distribution by native village", 
-      x = "Native village", 
-      y = "Age")+
+  scale_color_manual(values = v_palette_pander[c(4,5,7)])+
+  labs(title = "Respondents' age distribution by native village",
+       x = "Native village",
+       y = "Age")+
   theme_bw()
 ```
 
@@ -249,7 +255,7 @@ df_brand_summary <- df_brand %>%
 # absolute
 df_brand_summary %>%  
   ggplot(aes(reorder(brand, no_of_response), no_of_response))+
-  geom_col()+
+  geom_col(fill = v_palette_pander[1])+
   geom_text(aes(y = 170, label = proportion))+
   coord_flip()+
   labs(x = "Brands", y = "Number of Respondents",
@@ -281,6 +287,7 @@ df_brand %>%
 # 5. Data exploration
 ## 5.1 Key influencing factors
 
+Average rating score of 6 key factors:
 ```{r}
 # section A ---------------------------------------------------------------
 # extract A section column names 
@@ -292,16 +299,25 @@ names(df_a) <- df_names_a[["col_label"]]
 df_a %>% 
   summarise_all(~round(mean(.), 2)) %>% 
   kable_adj()
+```
 
+The challenge of visualing ordinal categorical variables:
+```{r}
 ggplot(df_a, aes(Health, Sensory))+
   geom_point()+
   theme_bw()
+```
 
+Using 'jitter' trick...
+```{r}
 library(GGally)
 
 df_a %>% 
   ggpairs(lower = list(continuous=wrap("points", position="jitter", alpha = 0.2)))
+```
 
+... or using dimension reduction technique?
+```{r}
 library(psych)
 l_res_pca <- principal(df_a, nfactors=2, rotate="none")
 df_res_pca_score <- l_res_pca[["scores"]] %>% tbl_df()
@@ -310,11 +326,20 @@ respondent_labels <- 1:nrow(df_input)
 respondent_col <- rainbow(nrow(df_input))
 
 ggplot(df_res_pca_score, aes(PC1, PC2))+
-  geom_text(aes(label = respondent_labels, col = respondent_col))+
+  geom_text(aes(label = respondent_labels, col = respondent_col), 
+            position = position_jitter(height = 0.4))+
   theme_bw()+
   theme(legend.position = "none")
+```
 
+Revealing special cases:
+**Respondent 19:**
+```{r}
 df_a %>% filter(row_number() == 19) %>% kable_adj()
+```
+
+**Respondent 133:**
+```{r}
 df_a %>% filter(row_number() == 133) %>% kable_adj()
 ```
 
@@ -396,8 +421,8 @@ df_b_long %>%
         legend.position = "bottom")+
   guides(col = F,
          size = F)+
-  labs(x = "", y = "Number of respondents", fill = "Rating score")
-
+  labs(x = "", y = "Number of respondents", fill = "Rating score")+
+  theme_bw()
 ```
 
 
@@ -410,6 +435,7 @@ df_input %>%
   select(col_group, col_des, gender, value) %>% 
   ggplot(aes(value, reorder(col_des, value), col = gender, group = gender, shape = gender))+
   geom_point(size = 2)+
+  scale_color_manual(values = v_palette_pander[c(4,5)])+
   facet_grid(col_group ~., scales = "free_y")+
   labs(x = "Rating score", y = "Factors", fill = "Gender")+
   theme_bw()
