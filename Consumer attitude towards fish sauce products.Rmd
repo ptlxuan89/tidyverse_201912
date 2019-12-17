@@ -2,18 +2,20 @@
 title: "Consumer attitude towards fish sauce products"
 author: "Xuan Pham"
 date: "12/17/2019"
+always_allow_html: true
+# output: powerpoint_presentation
 output:
-  # pdf_document:
-  #   toc: yes
-  #   highlight: tango
-  #   df_print: kable
-  #   citation_package: natbib
-  #   keep_tex: true
-  # word_document:
-  #   toc: yes
   html_document:
     toc: yes
     toc_depth: 3
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+    highlight: tango
+    df_print: kable
+    citation_package: natbib
+    keep_tex: true
 editor_options:
   chunk_output_type: console
 ---
@@ -36,7 +38,7 @@ knitr::knit_hooks$set(inline = function(x) {
 })
 ```
 
-# 1. Setting up working environment
+# 1. Setting up the working environment
 
 ```{r, include=F}
 kable_adj <- function(data, names = NA, ncol = NA, width = NA) {
@@ -116,6 +118,10 @@ df_names_b <- read_excel("df_names.xlsx", sheet = "df_names_section_B")
 # 3. Sample structure understanding
 
 ## 3.1 Categorical variables
+
+Majority of respondents are female in their 20s (20-24 yo), obtained University degree, having full-time jobs and originally from the South. 
+
+### 3.1.1 Sample structure table summary
 ```{r}
 # sample structure --------------------------------------------------------
 # extract demographic section column names
@@ -156,6 +162,7 @@ df_sample_structure <-
 df_sample_structure %>% kable_adj(names = c("Variable", "Level", "No. of respondents", "% Respondents"))
 ```
 
+### 3.1.2 Sample structure plot
 ```{r}
 df_sample_structure %>% 
   ggplot(aes(reorder(value, no_of_respondent), no_of_respondent))+
@@ -170,6 +177,8 @@ df_sample_structure %>%
 
 ## 3.2 Continuous variables
 
+Respondent age is not normally distributed. 1/3 respondents are 22 years old. 
+
 ```{r}
 ggplot(df_demo, aes(age))+
   geom_histogram(binwidth = 1)+
@@ -181,6 +190,7 @@ ggplot(df_demo, aes(age))+
 
 ## 3.3 Continuous vs. categorical variables
 
+Female respondents age is extremely right skewed. 
 ```{r}
 df_demo %>% 
   ggplot(aes(age))+
@@ -191,6 +201,7 @@ df_demo %>%
   theme_bw()
 ```
 
+Age distributions of those who are from the South and Central are wider spread than the North group.
 ```{r}
 df_demo %>% 
   ggplot(aes(native.village, age, col = native.village))+
@@ -204,6 +215,7 @@ df_demo %>%
 
 # 4. Data cleaning
 
+Coding error is spotted! Each variable in brand section should have two levels only. Khai hoan brand has 4 levels.  
 ```{r}
 # extract C-1 section column names 
 v_c_1 <- df_names %>% filter(section == "C", question_no == 1) %>% .[["col_name"]]
@@ -212,7 +224,11 @@ df_input %>%
   select(ID, v_c_1) %>% 
   mutate_at(vars(v_c_1), factor) %>%
   summary()
+```
 
+Nam Ngu is the most popular brand and almost triple the second player - Chinsu in terms of the number of responses.
+
+```{r}
 # recode multiple answers
 df_brand <- df_input %>% 
   select(ID, v_c_1) %>%
@@ -243,6 +259,7 @@ df_brand_summary %>%
 ggsave(filename = "brand.png", width = 10, height = 6)
 ```
 
+There are few respondents gave more than required number of responses (maximum is 2).
 ```{r}
 df_brand_count <- df_brand %>% 
   group_by(ID) %>% 

@@ -101,7 +101,8 @@ ggplot(df_demo, aes(age))+
 
 df_demo %>% 
   ggplot(aes(age))+
-  geom_density(aes(fill = gender), alpha = 0.4)
+  geom_density(aes(fill = gender), alpha = 0.4)+
+  theme_bw()
 
 df_demo %>% 
   ggplot(aes(native.village, age, col = native.village))+
