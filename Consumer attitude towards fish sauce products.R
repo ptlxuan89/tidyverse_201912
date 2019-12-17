@@ -1,46 +1,34 @@
----
-title: "Consumer attitude towards fish sauce products"
-author: "Xuan Pham"
-date: "12/17/2019"
-always_allow_html: true
-# output: powerpoint_presentation
-output:
-  html_document:
-    toc: yes
-    toc_depth: 3
-  word_document:
-    toc: yes
-  pdf_document:
-    toc: yes
-    highlight: tango
-    df_print: kable
-    citation_package: natbib
-    keep_tex: true
-editor_options:
-  chunk_output_type: console
----
-<!-- <style> -->
-<!--      body .main-container { -->
-<!--          max-width: 1000px; -->
-<!--      } -->
-<!-- </style> -->
-
-```{r setup01, include=FALSE}
-knitr::opts_chunk$set(echo = T, 
-                      warning = FALSE, 
-                      message = FALSE, 
-                      comment = NA,
-                      # fig.align = 'center', 
-                      fig.width = 12, 
-                      fig.height = 6)
-knitr::knit_hooks$set(inline = function(x) {
-  prettyNum(x, big.mark=",")
-})
-```
-
-# 1. Setting up the working environment
-
-```{r, include=F}
+#' ---
+#' title: "Consumer attitude towards fish sauce products"
+#' author: "Xuan Pham"
+#' date: "12/17/2019"
+#' always_allow_html: true
+#' # output: powerpoint_presentation
+#' output:
+#'   html_document:
+#'     toc: yes
+#'     toc_depth: 3
+#'   word_document:
+#'     toc: yes
+#'   pdf_document:
+#'     toc: yes
+#'     highlight: tango
+#'     df_print: kable
+#'     citation_package: natbib
+#'     keep_tex: true
+#' editor_options:
+#'   chunk_output_type: console
+#' ---
+#' <!-- <style> -->
+#' <!--      body .main-container { -->
+#' <!--          max-width: 1000px; -->
+#' <!--      } -->
+#' <!-- </style> -->
+#' 
+#' 
+#' # 1. Setting up the working environment
+#' 
+## ---- include=F----------------------------------------------------------
 kable_adj <- function(data, names = NA, ncol = NA, width = NA) {
   
   p.value.exist <- data %>% 
@@ -94,37 +82,37 @@ kable_adj <- function(data, names = NA, ncol = NA, width = NA) {
 }
 
 v_palette_pander <- c("#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#999999","#E69F00","#56B4E9","#009E73")
-```
 
-```{r}
+#' 
+## ------------------------------------------------------------------------
 library(tidyverse)
 library(knitr)
 library(kableExtra)
-```
 
-# 2. Import data
-
-```{r}
+#' 
+#' # 2. Import data
+#' 
+## ------------------------------------------------------------------------
 df_input <- read_csv("survey_input.csv")
-```
 
-```{r}
+#' 
+## ------------------------------------------------------------------------
 # import excel ------------------------------------------------------------
 library(readxl)
 
 df_names <- read_excel("df_names.xlsx", sheet = "df_names")
 df_names_a <- read_excel("df_names.xlsx", sheet = "df_names_section_A")
 df_names_b <- read_excel("df_names.xlsx", sheet = "df_names_section_B")
-```
 
-# 3. Sample structure understanding
-
-## 3.1 Categorical variables
-
-Majority of respondents are female in their 20s (20-24 yo), obtained University degree, having full-time jobs and originally from the South. 
-
-### 3.1.1 Sample structure table summary
-```{r}
+#' 
+#' # 3. Sample structure understanding
+#' 
+#' ## 3.1 Categorical variables
+#' 
+#' Majority of respondents are female in their 20s (20-24 yo), obtained University degree, having full-time jobs and originally from the South. 
+#' 
+#' ### 3.1.1 Sample structure table summary
+## ------------------------------------------------------------------------
 # sample structure --------------------------------------------------------
 # extract demographic section column names
 v_d <- df_names %>% filter(section == "D") %>% .[["col_name"]]
@@ -162,10 +150,10 @@ df_sample_structure <-
   arrange(variable, desc(proportion))
 
 df_sample_structure %>% kable_adj(names = c("Variable", "Level", "No. of respondents", "% Respondents"))
-```
 
-### 3.1.2 Sample structure plot
-```{r}
+#' 
+#' ### 3.1.2 Sample structure plot
+## ------------------------------------------------------------------------
 df_sample_structure %>% 
   ggplot(aes(reorder(value, no_of_respondent), no_of_respondent))+
   geom_col(fill = v_palette_pander[1])+
@@ -175,13 +163,13 @@ df_sample_structure %>%
   theme_bw()+
   geom_hline(yintercept = 30)+
   coord_flip()
-```
 
-## 3.2 Continuous variables
-
-Respondent age is not normally distributed. 1/3 respondents are 22 years old. 
-
-```{r}
+#' 
+#' ## 3.2 Continuous variables
+#' 
+#' Respondent age is not normally distributed. 1/3 respondents are 22 years old. 
+#' 
+## ------------------------------------------------------------------------
 ggplot(df_demo, aes(age))+
   geom_histogram(binwidth = 1,
                  fill = v_palette_pander[1])+
@@ -189,12 +177,12 @@ ggplot(df_demo, aes(age))+
   geom_vline(xintercept = 22, col = "red")+
   labs(title = "Respondents' age distribution", x = "Age", y = "Number of respondents")+
   theme_bw()
-```
 
-## 3.3 Continuous vs. categorical variables
-
-Female respondents age is extremely right skewed. 
-```{r}
+#' 
+#' ## 3.3 Continuous vs. categorical variables
+#' 
+#' Female respondents age is extremely right skewed. 
+## ------------------------------------------------------------------------
 df_demo %>% 
   ggplot(aes(age))+
   geom_density(aes(fill = gender, col = gender), alpha = 0.4)+
@@ -204,10 +192,10 @@ df_demo %>%
       x = "Age", 
       y = "Density")+
   theme_bw()
-```
 
-Age distributions of those who are from the South and Central are wider spread than the North group.
-```{r}
+#' 
+#' Age distributions of those who are from the South and Central are wider spread than the North group.
+## ------------------------------------------------------------------------
 df_demo %>% 
   ggplot(aes(native.village, age, col = native.village))+
   geom_boxplot(alpha = 0)+
@@ -217,12 +205,12 @@ df_demo %>%
        x = "Native village",
        y = "Age")+
   theme_bw()
-```
 
-# 4. Data cleaning
-
-Coding error is spotted! Each variable in brand section should have two levels only. Khai hoan brand has 4 levels.  
-```{r}
+#' 
+#' # 4. Data cleaning
+#' 
+#' Coding error is spotted! Each variable in brand section should have two levels only. Khai hoan brand has 4 levels.  
+## ------------------------------------------------------------------------
 # extract C-1 section column names 
 v_c_1 <- df_names %>% filter(section == "C", question_no == 1) %>% .[["col_name"]]
 
@@ -230,11 +218,11 @@ df_input %>%
   select(ID, v_c_1) %>% 
   mutate_at(vars(v_c_1), factor) %>%
   summary()
-```
 
-Nam Ngu is the most popular brand and almost triple the second player - Chinsu in terms of the number of responses.
-
-```{r}
+#' 
+#' Nam Ngu is the most popular brand and almost triple the second player - Chinsu in terms of the number of responses.
+#' 
+## ------------------------------------------------------------------------
 # recode multiple answers
 df_brand <- df_input %>% 
   select(ID, v_c_1) %>%
@@ -263,10 +251,10 @@ df_brand_summary %>%
   theme_bw()
 
 ggsave(filename = "brand.png", width = 10, height = 6)
-```
 
-There are few respondents gave more than the required number of responses (maximum is 2).
-```{r}
+#' 
+#' There are few respondents gave more than the required number of responses (maximum is 2).
+## ------------------------------------------------------------------------
 df_brand_count <- df_brand %>% 
   group_by(ID) %>% 
   summarise(brand_count = n_distinct(brand)) %>% 
@@ -282,13 +270,13 @@ df_brand %>%
   arrange(desc(brand_count)) %>% 
   head(n = 10) %>% 
   kable_adj(names = c("Respondent ID", "Brand 1", "Brand 2", "Brand 3", "Brand 4", "Number of brands declared"))
-```
 
-# 5. Data exploration
-## 5.1 Key influencing factors
-
-Average rating score of 6 key factors:
-```{r}
+#' 
+#' # 5. Data exploration
+#' ## 5.1 Key influencing factors
+#' 
+#' Average rating score of 6 key factors:
+## ------------------------------------------------------------------------
 # section A ---------------------------------------------------------------
 # extract A section column names 
 v_a <- df_names %>% filter(section == "A") %>% .[["col_name"]]
@@ -299,28 +287,28 @@ names(df_a) <- df_names_a[["col_label"]]
 df_a %>% 
   summarise_all(~round(mean(.), 2)) %>% 
   kable_adj()
-```
-**Quality** seems to be the most influencing factor. 
 
-
-The challenge of visualing ordinal categorical variables:
-```{r}
+#' **Quality** seems to be the most influencing factor. 
+#' 
+#' 
+#' The challenge of visualing ordinal categorical variables:
+## ------------------------------------------------------------------------
 ggplot(df_a, aes(Health, Sensory))+
   geom_point()+
   theme_bw()
-```
 
-Using 'jitter' trick...
-
-```{r}
+#' 
+#' Using 'jitter' trick...
+#' 
+## ------------------------------------------------------------------------
 library(GGally)
 
 df_a %>% 
   ggpairs(lower = list(continuous=wrap("points", position="jitter", alpha = 0.2)))
-```
 
-... or using dimension reduction technique?
-```{r}
+#' 
+#' ... or using dimension reduction technique?
+## ------------------------------------------------------------------------
 library(psych)
 l_res_pca <- principal(df_a, nfactors=2, rotate="none")
 df_res_pca_score <- l_res_pca[["scores"]] %>% tbl_df()
@@ -333,25 +321,25 @@ ggplot(df_res_pca_score, aes(PC1, PC2))+
             position = position_jitter(height = 0.4))+
   theme_bw()+
   theme(legend.position = "none")
-```
 
-**Revealing special cases:**
-
-**Respondent 19:**
-```{r}
+#' 
+#' **Revealing special cases:**
+#' 
+#' **Respondent 19:**
+## ------------------------------------------------------------------------
 df_a %>% filter(row_number() == 19) %>% kable_adj()
-```
 
-**Respondent 133:**
-```{r}
+#' 
+#' **Respondent 133:**
+## ------------------------------------------------------------------------
 df_a %>% filter(row_number() == 133) %>% kable_adj()
-```
 
-
-## 5.2 Important factors
-
-Looking into sub-factors, the **product origin** seems to be the most concerning factor when choosing fish sauce products. 
-```{r}
+#' 
+#' 
+#' ## 5.2 Important factors
+#' 
+#' Looking into sub-factors, the **product origin** seems to be the most concerning factor when choosing fish sauce products. 
+## ------------------------------------------------------------------------
 # section B ---------------------------------------------------------------
 # extract B section column names 
 v_b <- df_names %>% filter(section == "B") %>% .[["col_name"]]
@@ -383,9 +371,9 @@ df_b_long_summary <- df_b_long %>%
   summarise(value = round(mean(value), 1)) %>% 
   ungroup() %>% 
   arrange(value)
-```
 
-```{r fig.height=8, fig.width=10}
+#' 
+## ----fig.height=8, fig.width=10------------------------------------------
 df_b_long %>% 
   group_by(variable, col_des, col_des_vn, col_group, value) %>% 
   summarise(no_of_response = n()) %>%  
@@ -403,12 +391,12 @@ df_b_long %>%
          size = F)+
   labs(x = "", y = "Number of respondents", fill = "Rating score")+
   theme_bw()
-```
 
-The origin factor is highly important for both male and female groups. 
-Male respondents seem to give higher scores in most of the factors compared to their counterparts. However, female respondents seem to care more about whether the products are available in shops, keeping them healthy and reflecting the local culture than male. 
-
-```{r fig.height=8, fig.width=10}
+#' 
+#' The origin factor is highly important for both male and female groups. 
+#' Male respondents seem to give higher scores in most of the factors compared to their counterparts. However, female respondents seem to care more about whether the products are available in shops, keeping them healthy and reflecting the local culture than male. 
+#' 
+## ----fig.height=8, fig.width=10------------------------------------------
 df_input %>% 
   group_by(gender) %>% 
   summarise_at(vars(v_b), ~round(mean(.),2)) %>% 
@@ -421,9 +409,9 @@ df_input %>%
   facet_grid(col_group ~., scales = "free_y")+
   labs(x = "Rating score", y = "Factors", fill = "Gender")+
   theme_bw()
-```
 
-```{r}
+#' 
+## ------------------------------------------------------------------------
 df_input %>% 
   group_by(gender) %>% 
   summarise_at(vars(v_b), ~round(mean(.),2)) %>% 
@@ -445,5 +433,6 @@ df_input %>%
   pack_rows("Quality and safety", 11, 14) %>%
   pack_rows("Sensory appeal", 15, 19) %>%
   pack_rows("Traditional value", 20, 24)
-```
+
+#' 
 
