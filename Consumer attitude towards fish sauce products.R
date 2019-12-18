@@ -114,9 +114,6 @@ df_names_b <- read_excel("df_names.xlsx", sheet = "df_names_section_B")
 #' ### 3.1.1 Sample structure table summary
 ## ------------------------------------------------------------------------
 # sample structure --------------------------------------------------------
-# extract demographic section column names
-v_d <- df_names %>% filter(section == "D") %>% .[["col_name"]]
-
 df_input <- df_input %>% 
   mutate(native.village = factor(native.village, 
                                  levels = c("North", "Middle", "South"),
@@ -134,6 +131,8 @@ df_input <- df_input %>%
                             levels = c("20_24t", "25_35t", ">35t"),
                             labels = c("20-24 yo", "25-35 yo", "Above 35 yo")))
 
+# extract demographic section column names
+v_d <- df_names %>% filter(section == "D") %>% .[["col_name"]]
 df_demo <- df_input %>% select(ID, v_d)
 
 df_sample_structure <-
@@ -154,6 +153,12 @@ df_sample_structure %>% kable_adj(names = c("Variable", "Level", "No. of respond
 #' 
 #' ### 3.1.2 Sample structure plot
 ## ------------------------------------------------------------------------
+ggplot(df_sample_structure, aes(reorder(value,no_of_respondent), no_of_respondent))+
+  geom_col()+
+  coord_flip()+
+  facet_wrap(~variable, scales = "free_y")+
+  theme_bw()
+
 df_sample_structure %>% 
   ggplot(aes(reorder(value, no_of_respondent), no_of_respondent))+
   geom_col(fill = v_palette_pander[1])+
